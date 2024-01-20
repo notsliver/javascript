@@ -1,0 +1,31 @@
+{
+	"name": "@discolytics/core",
+	"version": "0.1.1",
+	"description": "",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsup src/index.ts --format cjs,esm --dts",
+		"lint": "eslint . --max-warnings 0"
+	},
+	"devDependences": {
+		"@repo/eslint-config": "*",
+		"@repo/typescript-config": "*",
+		"@types/node": "^20.10.6",
+		"@types/eslint": "^8.56.1",
+		"eslint": "^8.56.0",
+		"typescript": "^5.3.3",
+		"@types/node-fetch": "^2.6.11"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"node-fetch": "^2.7.0",
+		"tsup": "^8.0.1"
+	},
+	"devDependencies": {
+		"@types/node-fetch": "^2.6.11"
+	}
+}
