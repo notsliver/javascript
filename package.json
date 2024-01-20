@@ -5,7 +5,8 @@
 		"build": "turbo build",
 		"dev": "turbo dev",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
-		"publish-packages": "turbo run build && changeset version && changeset publish"
+		"changeset": "npx changeset",
+		"publish-packages": "turbo run build && changeset version && changeset publish && git push --tags"
 	},
 	"devDependencies": {
 		"@repo/eslint-config": "*",
