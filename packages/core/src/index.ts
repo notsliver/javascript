@@ -1,2 +1,1 @@
-import Client from './core';
-export default Client;
+export * from './core';

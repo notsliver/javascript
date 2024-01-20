@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { ClientType, EVENTS_API_URL } from './constants';
 
-class Client {
+export class Client {
 	private botId: string;
 	private apiKey: string;
 	private clientType: ClientType;
@@ -47,5 +47,3 @@ class Client {
 		return { success };
 	}
 }
-
-export default Client;
