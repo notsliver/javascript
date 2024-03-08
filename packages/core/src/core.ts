@@ -1,7 +1,7 @@
 // event emitter implementation taken from https://stackoverflow.com/a/61609010
 
 import fetch from 'node-fetch';
-import { API_URL, ClientType, EVENTS_API_URL } from './constants';
+import { API_URL, ClientType, DATA_API_URL } from './constants';
 import { EventEmitter } from 'events';
 import type { User } from './types/discord';
 import pidusage from 'pidusage';
@@ -40,7 +40,7 @@ export class CoreClient extends EventEmitter {
 	private botId: string;
 	private apiKey: string;
 	private clientType: ClientType;
-	private eventsApiUrl: string;
+	private dataApiUrl: string;
 	private apiUrl: string;
 	captureEvents: string[];
 	private auth: string;
@@ -49,7 +49,7 @@ export class CoreClient extends EventEmitter {
 		botId: string;
 		apiKey: string;
 		clientType?: ClientType;
-		eventsApiUrl?: string;
+		dataApiUrl?: string;
 		apiUrl?: string;
 		auth: string;
 	}) {
@@ -57,7 +57,7 @@ export class CoreClient extends EventEmitter {
 		this.botId = data.botId;
 		this.apiKey = data.apiKey;
 		this.clientType = data.clientType ?? ClientType.UNKNOWN;
-		this.eventsApiUrl = data.eventsApiUrl ?? EVENTS_API_URL;
+		this.dataApiUrl = data.dataApiUrl ?? DATA_API_URL;
 		this.apiUrl = data.apiUrl ?? API_URL;
 		this.captureEvents = [];
 		this.auth = data.auth;
@@ -140,7 +140,7 @@ export class CoreClient extends EventEmitter {
 	}
 
 	async sendEvent(name: string, data: unknown): Promise<{ success: boolean }> {
-		const res = await fetch(`${this.eventsApiUrl}/bots/${this.botId}/events`, {
+		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/events`, {
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: this.apiKey,
@@ -163,20 +163,17 @@ export class CoreClient extends EventEmitter {
 	}
 
 	async postCpuUsage(value: number) {
-		const res = await fetch(
-			`${this.eventsApiUrl}/bots/${this.botId}/cpuUsage`,
-			{
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: this.apiKey,
-				},
-				method: 'POST',
-				body: JSON.stringify({
-					value,
-					clientType: this.clientType,
-				}),
-			}
-		).catch(() => null);
+		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/cpuUsage`, {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: this.apiKey,
+			},
+			method: 'POST',
+			body: JSON.stringify({
+				value,
+				clientType: this.clientType,
+			}),
+		}).catch(() => null);
 
 		if (!res) {
 			// no response
@@ -188,20 +185,17 @@ export class CoreClient extends EventEmitter {
 	}
 
 	async postMemUsage(value: number) {
-		const res = await fetch(
-			`${this.eventsApiUrl}/bots/${this.botId}/memUsage`,
-			{
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: this.apiKey,
-				},
-				method: 'POST',
-				body: JSON.stringify({
-					value,
-					clientType: this.clientType,
-				}),
-			}
-		).catch(() => null);
+		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/memUsage`, {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: this.apiKey,
+			},
+			method: 'POST',
+			body: JSON.stringify({
+				value,
+				clientType: this.clientType,
+			}),
+		}).catch(() => null);
 
 		if (!res) {
 			// no response

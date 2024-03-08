@@ -8,7 +8,7 @@ export class Client {
 	constructor(data: {
 		botId: string;
 		apiKey: string;
-		eventsApiUrl?: string;
+		dataApiUrl?: string;
 		apiUrl?: string;
 		bot: Bot;
 	}) {
