@@ -1,6 +1,6 @@
 {
-	"name": "@discolytics/core",
-	"version": "0.1.4",
+	"name": "@discolytics/oceanicjs",
+	"version": "0.1.0",
 	"description": "",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -14,20 +14,13 @@
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts"
 	},
-	"devDependencies": {
-		"@types/eslint": "^8.56.1",
-		"@types/node": "^20.10.6",
-		"@types/node-fetch": "^2.6.11",
-		"@types/pidusage": "^2.0.5",
-		"eslint": "^8.56.0",
-		"typescript": "^5.3.3"
-	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"node-fetch": "^2.7.0",
-		"pidusage": "^3.0.2",
-		"tsup": "^8.0.1"
+		"@discolytics/core": "*"
+	},
+	"devDependencies": {
+		"oceanic.js": "^1.9.0"
 	}
 }
