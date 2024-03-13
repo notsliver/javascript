@@ -22,9 +22,11 @@ export class Client {
 		this.bot = data.bot;
 
 		this.bot.on('packet', async (data) => {
-			if (this.core.captureEvents.includes(data.t)) {
-				await this.core.sendEvent(data.t, data.d);
-			}
+			await this.core.sendEvent(data.t);
 		});
+	}
+
+	async postCommand(name: string, userId: string, metadata?: unknown) {
+		return await this.core.postCommand(name, userId, metadata);
 	}
 }

@@ -1,26 +1,7 @@
-// event emitter implementation taken from https://stackoverflow.com/a/61609010
-
 import fetch from 'node-fetch';
 import { API_URL, ClientType, DATA_API_URL } from './constants';
-import { EventEmitter } from 'events';
 import type { User } from './types/discord';
 import pidusage from 'pidusage';
-
-interface CoreClientEvents {
-	captureEventsUpdate: () => void;
-}
-
-export declare interface CoreClient {
-	on<U extends keyof CoreClientEvents>(
-		event: U,
-		listener: CoreClientEvents[U]
-	): this;
-
-	emit<U extends keyof CoreClientEvents>(
-		event: U,
-		...args: Parameters<CoreClientEvents[U]>
-	): boolean;
-}
 
 interface GetBotData {
 	captureEvents: string[];
@@ -36,13 +17,12 @@ interface PatchBotData {
 	botUserAvatar?: string;
 }
 
-export class CoreClient extends EventEmitter {
+export class CoreClient {
 	private botId: string;
 	private apiKey: string;
 	private clientType: ClientType;
 	private dataApiUrl: string;
 	private apiUrl: string;
-	captureEvents: string[];
 	private auth: string;
 
 	constructor(data: {
@@ -53,19 +33,15 @@ export class CoreClient extends EventEmitter {
 		apiUrl?: string;
 		auth: string;
 	}) {
-		super();
 		this.botId = data.botId;
 		this.apiKey = data.apiKey;
 		this.clientType = data.clientType ?? ClientType.UNKNOWN;
 		this.dataApiUrl = data.dataApiUrl ?? DATA_API_URL;
 		this.apiUrl = data.apiUrl ?? API_URL;
-		this.captureEvents = [];
 		this.auth = data.auth;
 
-		this.getCaptureEvents();
-		setInterval(() => {
-			this.getCaptureEvents();
-		}, 1000 * 60);
+		this.patchBot({}); // update client type
+		this.getBot();
 
 		setInterval(() => {
 			pidusage(process.pid, (err, stats) => {
@@ -116,7 +92,7 @@ export class CoreClient extends EventEmitter {
 				Authorization: this.apiKey,
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(data),
+			body: JSON.stringify({ ...data, clientType: this.clientType }),
 			method: 'PATCH',
 		}).catch(() => null);
 
@@ -126,20 +102,7 @@ export class CoreClient extends EventEmitter {
 		return { success: res.status >= 200 && res.status < 300 };
 	}
 
-	private async getCaptureEvents(): Promise<{
-		success: boolean;
-		eventNames: string[];
-	}> {
-		const { data } = await this.getBot();
-
-		if (!data) return { success: false, eventNames: [] };
-
-		this.captureEvents = data.captureEvents;
-		this.emit('captureEventsUpdate');
-		return { success: true, eventNames: data.captureEvents };
-	}
-
-	async sendEvent(name: string, data: unknown): Promise<{ success: boolean }> {
+	async sendEvent(name: string): Promise<{ success: boolean }> {
 		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/events`, {
 			headers: {
 				'Content-Type': 'application/json',
@@ -149,7 +112,6 @@ export class CoreClient extends EventEmitter {
 			body: JSON.stringify({
 				name,
 				clientType: this.clientType,
-				data,
 			}),
 		}).catch(() => null);
 
@@ -194,6 +156,29 @@ export class CoreClient extends EventEmitter {
 			body: JSON.stringify({
 				value,
 				clientType: this.clientType,
+			}),
+		}).catch(() => null);
+
+		if (!res) {
+			// no response
+			return { success: false };
+		}
+
+		const success = res.status >= 200 && res.status < 300;
+		return { success };
+	}
+
+	async postCommand(name: string, userId: string, metadata?: unknown) {
+		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/command`, {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: this.apiKey,
+			},
+			method: 'POST',
+			body: JSON.stringify({
+				name,
+				userId,
+				metadata,
 			}),
 		}).catch(() => null);
 
