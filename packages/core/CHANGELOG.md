@@ -1,5 +1,11 @@
 # @discolytics/core
 
+## 0.1.5
+
+### Patch Changes
+
+- fixes and stuff
+
 ## 0.1.4
 
 ### Patch Changes
