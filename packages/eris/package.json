@@ -1,0 +1,24 @@
+{
+	"name": "@discolytics/eris",
+	"version": "0.1.0",
+	"description": "",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsup src/index.ts --format cjs,esm --dts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@discolytics/core": "*",
+		"eris": "^0.17.2"
+	}
+}

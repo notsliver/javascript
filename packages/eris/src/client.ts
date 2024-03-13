@@ -1,5 +1,5 @@
 import { CoreClient, ClientType } from '@discolytics/core';
-import type { Client as Bot } from 'oceanic.js';
+import { Client as Bot } from 'eris';
 
 export class Client {
 	private core: CoreClient;
@@ -12,16 +12,17 @@ export class Client {
 		apiUrl?: string;
 		bot: Bot;
 	}) {
-		if (!data.bot.options.auth)
-			throw new Error('Auth not passed to OceanicJS client');
+		const token = (data.bot as any)._token;
+		if (!token) throw new Error('Auth not passed to Eris client');
 		this.core = new CoreClient({
 			...data,
-			clientType: ClientType.OCEANIC_JS,
-			auth: data.bot.options.auth,
+			clientType: ClientType.ERIS,
+			auth: token,
 		});
 		this.bot = data.bot;
 
-		this.bot.on('packet', async (data) => {
+		this.bot.on('rawWS', async (data) => {
+			if (!data.t) return;
 			await this.core.sendEvent(data.t, (data.d as any)?.guild_id);
 		});
 	}

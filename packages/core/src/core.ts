@@ -102,7 +102,10 @@ export class CoreClient {
 		return { success: res.status >= 200 && res.status < 300 };
 	}
 
-	async sendEvent(name: string): Promise<{ success: boolean }> {
+	async sendEvent(
+		name: string,
+		guildId: string
+	): Promise<{ success: boolean }> {
 		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/events`, {
 			headers: {
 				'Content-Type': 'application/json',
@@ -111,7 +114,7 @@ export class CoreClient {
 			method: 'POST',
 			body: JSON.stringify({
 				name,
-				clientType: this.clientType,
+				guildId,
 			}),
 		}).catch(() => null);
 
