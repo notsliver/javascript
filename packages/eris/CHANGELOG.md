@@ -1,5 +1,11 @@
 # @discolytics/eris
 
+## 0.1.2
+
+### Patch Changes
+
+- bump to new core version
+
 ## 0.1.1
 
 ### Patch Changes
