@@ -1,5 +1,11 @@
 # @discolytics/core
 
+## 0.1.6
+
+### Patch Changes
+
+- fix api urls
+
 ## 0.1.5
 
 ### Patch Changes
