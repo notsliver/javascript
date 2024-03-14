@@ -18,7 +18,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@discolytics/core": "*"
+		"@discolytics/core": "^0.1.6"
 	},
 	"devDependencies": {
 		"oceanic.js": "^1.9.0"
