@@ -1,5 +1,11 @@
 # @discolytics/oceanicjs
 
+## 0.1.3
+
+### Patch Changes
+
+- correct core version
+
 ## 0.1.2
 
 ### Patch Changes
