@@ -1,5 +1,5 @@
-export const DATA_API_URL = 'https://data.discolytics.com';
-export const API_URL = 'https://api.discolytics.com';
+export const DATA_API_URL = 'https://data.discolytics.com/api';
+export const API_URL = 'https://api.discolytics.com/api';
 
 export enum ClientType {
 	UNKNOWN,
