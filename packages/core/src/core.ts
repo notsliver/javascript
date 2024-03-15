@@ -1,6 +1,11 @@
 import fetch from 'node-fetch';
-import { API_URL, ClientType, DATA_API_URL } from './constants';
-import type { User } from './types/discord';
+import {
+	API_URL,
+	ClientType,
+	DATA_API_URL,
+	DISCORD_API_URL,
+} from './constants';
+import type { Application, User } from './types/discord';
 import pidusage from 'pidusage';
 
 interface GetBotData {
@@ -55,6 +60,13 @@ export class CoreClient {
 		setInterval(() => {
 			this.sendHeartbeat();
 		}, 1000 * 30);
+
+		setInterval(
+			() => {
+				this.postGuildCount();
+			},
+			1000 * 60 * 5
+		);
 	}
 
 	async getBot(): Promise<
@@ -199,7 +211,7 @@ export class CoreClient {
 	}
 
 	private async getBotUser() {
-		const res = await fetch(`https://discord.com/api/v10/users/@me`, {
+		const res = await fetch(`${DISCORD_API_URL}/users/@me`, {
 			headers: {
 				Authorization: this.auth,
 			},
@@ -231,6 +243,49 @@ export class CoreClient {
 			},
 			method: 'POST',
 		}).catch(() => null);
+
+		if (!res) return { success: false };
+
+		const success = res.status >= 200 && res.status < 300;
+		return { success };
+	}
+
+	private async getApplication() {
+		const res = await fetch(`${DISCORD_API_URL}/applications/@me`, {
+			headers: {
+				Authorization: this.auth,
+			},
+		}).catch(() => null);
+
+		if (!res) return;
+
+		const data = (await res.json()) as Application;
+
+		return data;
+	}
+
+	private async getGuildCount() {
+		const application = await this.getApplication();
+		return application?.approximate_guild_count;
+	}
+
+	private async postGuildCount() {
+		const count = await this.getGuildCount();
+		if (count == null) return { success: false };
+
+		const res = await fetch(
+			`${this.dataApiUrl}/bots/${this.botId}/guildCount`,
+			{
+				headers: {
+					Authorization: this.apiKey,
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+				body: JSON.stringify({
+					count,
+				}),
+			}
+		).catch(() => null);
 
 		if (!res) return { success: false };
 

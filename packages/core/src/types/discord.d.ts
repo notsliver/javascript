@@ -6,3 +6,9 @@ export interface User {
 	discriminator: string;
 	avatar: string | null;
 }
+
+export interface Application {
+	id: string;
+	name: string;
+	approximate_guild_count?: number;
+}
