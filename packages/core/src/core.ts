@@ -227,7 +227,7 @@ export class CoreClient {
 	private async sendHeartbeat() {
 		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/heartbeat`, {
 			headers: {
-				Authorization: this.auth,
+				Authorization: this.apiKey,
 			},
 			method: 'POST',
 		}).catch(() => null);
