@@ -51,6 +51,10 @@ export class CoreClient {
 				this.postMemUsage(stats.memory);
 			});
 		}, 1000 * 10);
+
+		setInterval(() => {
+			this.sendHeartbeat();
+		}, 1000 * 30);
 	}
 
 	async getBot(): Promise<
@@ -218,5 +222,19 @@ export class CoreClient {
 		}
 
 		return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+	}
+
+	private async sendHeartbeat() {
+		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/heartbeat`, {
+			headers: {
+				Authorization: this.auth,
+			},
+			method: 'POST',
+		}).catch(() => null);
+
+		if (!res) return { success: false };
+
+		const success = res.status >= 200 && res.status < 300;
+		return { success };
 	}
 }
