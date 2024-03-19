@@ -1,6 +1,6 @@
 {
 	"name": "@discolytics/eris",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -18,7 +18,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@discolytics/core": "^0.2.0",
+		"@discolytics/core": "^0.3.0",
 		"eris": "^0.17.2"
 	}
 }

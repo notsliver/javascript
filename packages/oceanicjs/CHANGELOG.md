@@ -1,5 +1,16 @@
 # @discolytics/oceanicjs
 
+## 0.3.0
+
+### Minor Changes
+
+- add durations to commands
+
+### Patch Changes
+
+- Updated dependencies
+  - @discolytics/core@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
