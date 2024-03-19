@@ -29,6 +29,7 @@ export class CoreClient {
 	private dataApiUrl: string;
 	private apiUrl: string;
 	private auth: string;
+	private primary: boolean;
 
 	constructor(data: {
 		botId: string;
@@ -37,6 +38,7 @@ export class CoreClient {
 		dataApiUrl?: string;
 		apiUrl?: string;
 		auth: string;
+		primary?: boolean;
 	}) {
 		this.botId = data.botId;
 		this.apiKey = data.apiKey;
@@ -44,29 +46,32 @@ export class CoreClient {
 		this.dataApiUrl = data.dataApiUrl ?? DATA_API_URL;
 		this.apiUrl = data.apiUrl ?? API_URL;
 		this.auth = data.auth;
+		this.primary = data.primary ?? true;
 
-		this.patchBot({}); // update client type
-		this.getBot();
+		if (this.primary) {
+			this.patchBot({}); // update client type
+			this.getBot();
 
-		setInterval(() => {
-			pidusage(process.pid, (err, stats) => {
-				if (err) return console.error(err);
+			setInterval(() => {
+				pidusage(process.pid, (err, stats) => {
+					if (err) return console.error(err);
 
-				this.postCpuUsage(stats.cpu);
-				this.postMemUsage(stats.memory);
-			});
-		}, 1000 * 10);
+					this.postCpuUsage(stats.cpu);
+					this.postMemUsage(stats.memory);
+				});
+			}, 1000 * 10);
 
-		setInterval(() => {
-			this.sendHeartbeat();
-		}, 1000 * 30);
+			setInterval(() => {
+				this.sendHeartbeat();
+			}, 1000 * 30);
 
-		setInterval(
-			() => {
-				this.postGuildCount();
-			},
-			1000 * 60 * 5
-		);
+			setInterval(
+				() => {
+					this.postGuildCount();
+				},
+				1000 * 60 * 5
+			);
+		}
 	}
 
 	async getBot(): Promise<
