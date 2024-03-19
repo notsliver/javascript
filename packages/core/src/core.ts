@@ -187,7 +187,23 @@ export class CoreClient {
 		return { success };
 	}
 
-	async postCommand(name: string, userId: string, metadata?: unknown) {
+	startCommand(name: string, userId: string) {
+		const start = Date.now();
+		return {
+			end: async (metadata?: unknown) => {
+				const end = Date.now();
+				const duration = end - start;
+				return await this.postCommand(name, userId, duration, metadata);
+			},
+		};
+	}
+
+	async postCommand(
+		name: string,
+		userId: string,
+		duration: number,
+		metadata?: unknown
+	) {
 		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/command`, {
 			headers: {
 				'Content-Type': 'application/json',
@@ -198,6 +214,7 @@ export class CoreClient {
 				name,
 				userId,
 				metadata,
+				duration,
 			}),
 		}).catch(() => null);
 

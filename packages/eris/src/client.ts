@@ -27,7 +27,7 @@ export class Client {
 		});
 	}
 
-	async postCommand(name: string, userId: string, metadata?: unknown) {
-		return await this.core.postCommand(name, userId, metadata);
+	startCommand(name: string, userId: string) {
+		return this.core.startCommand(name, userId);
 	}
 }
