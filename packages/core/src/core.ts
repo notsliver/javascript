@@ -7,7 +7,6 @@ import {
 } from './constants';
 import type { Application, InteractionTypes, User } from './types/discord';
 import pidusage from 'pidusage';
-import CommandInstance from './CommandInstance';
 
 interface GetBotData {
 	captureEvents: string[];
@@ -219,14 +218,14 @@ export class CoreClient {
 	}
 
 	startCommand(name: string, userId: string) {
-		return new CommandInstance({
-			name,
-			userId,
-			start: Date.now(),
-			dataApiUrl: this.dataApiUrl,
-			apiKey: this.apiKey,
-			botId: this.botId,
-		});
+		const start = Date.now();
+		return {
+			end: async (metadata?: unknown) => {
+				const end = Date.now();
+				const duration = end - start;
+				return await this.postCommand(name, userId, duration, metadata);
+			},
+		};
 	}
 
 	async postCommand(
