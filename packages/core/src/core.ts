@@ -5,7 +5,7 @@ import {
 	DATA_API_URL,
 	DISCORD_API_URL,
 } from './constants';
-import type { Application, User } from './types/discord';
+import type { Application, InteractionTypes, User } from './types/discord';
 import pidusage from 'pidusage';
 
 interface GetBotData {
@@ -125,7 +125,7 @@ export class CoreClient {
 
 	async sendEvent(
 		name: string,
-		guildId: string
+		guildId?: string
 	): Promise<{ success: boolean }> {
 		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/events`, {
 			headers: {
@@ -135,6 +135,28 @@ export class CoreClient {
 			method: 'POST',
 			body: JSON.stringify({
 				name,
+				guildId,
+			}),
+		}).catch(() => null);
+
+		if (!res) {
+			// no response
+			return { success: false };
+		}
+
+		const success = res.status >= 200 && res.status < 300;
+		return { success };
+	}
+
+	async postInteraction(type: InteractionTypes, guildId?: string) {
+		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/interactions`, {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: this.apiKey,
+			},
+			method: 'POST',
+			body: JSON.stringify({
+				type,
 				guildId,
 			}),
 		}).catch(() => null);

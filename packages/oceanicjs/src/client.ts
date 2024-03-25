@@ -22,7 +22,11 @@ export class Client {
 		this.bot = data.bot;
 
 		this.bot.on('packet', async (data) => {
-			await this.core.sendEvent(data.t, (data.d as any)?.guild_id);
+			const d = data.d as any;
+			await this.core.sendEvent(data.t, d?.guild_id);
+			if (data.t === 'INTERACTION_CREATE' && d?.type) {
+				await this.core.postInteraction(d.type, d.guild_id);
+			}
 		});
 	}
 
