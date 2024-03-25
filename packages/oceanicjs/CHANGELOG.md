@@ -1,5 +1,13 @@
 # @discolytics/oceanicjs
 
+## 0.3.1
+
+### Patch Changes
+
+- changes
+- Updated dependencies
+  - @discolytics/core@0.3.2
+
 ## 0.3.0
 
 ### Minor Changes

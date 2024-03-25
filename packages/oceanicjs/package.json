@@ -1,6 +1,6 @@
 {
 	"name": "@discolytics/oceanicjs",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"description": "",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -18,7 +18,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@discolytics/core": "^0.3.0"
+		"@discolytics/core": "^0.3.2"
 	},
 	"devDependencies": {
 		"oceanic.js": "^1.9.0"
