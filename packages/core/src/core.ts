@@ -69,7 +69,7 @@ export class CoreClient {
 				() => {
 					this.postGuildCount();
 				},
-				1000 * 60 * 5
+				1000 * 60 * 30
 			);
 		}
 	}
