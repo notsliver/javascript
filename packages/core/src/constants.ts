@@ -8,3 +8,5 @@ export enum ClientType {
 	ERIS,
 	OCEANIC_JS,
 }
+
+export type LOG_LEVEL = 'info' | 'error' | 'debug'

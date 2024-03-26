@@ -1,7 +1,7 @@
-import { CoreClient, ClientType } from '@discolytics/core';
+import { Discolytics as CoreClient, ClientType } from '@discolytics/core';
 import type { Client as Bot } from 'oceanic.js';
 
-export class Client {
+export class Discolytics {
 	private core: CoreClient;
 	private bot: Bot;
 

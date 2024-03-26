@@ -1,7 +1,7 @@
-import { CoreClient, ClientType } from '@discolytics/core';
+import { Discolytics as CoreClient, ClientType } from '@discolytics/core';
 import { Client as Bot } from 'eris';
 
-export class Client {
+export class Discolytics {
 	private core: CoreClient;
 	private bot: Bot;
 

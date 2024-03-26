@@ -4,6 +4,7 @@ import {
 	ClientType,
 	DATA_API_URL,
 	DISCORD_API_URL,
+	type LOG_LEVEL,
 } from './constants';
 import type { Application, InteractionTypes, User } from './types/discord';
 import pidusage from 'pidusage';
@@ -22,7 +23,7 @@ interface PatchBotData {
 	botUserAvatar?: string;
 }
 
-export class CoreClient {
+export class Discolytics {
 	private botId: string;
 	private apiKey: string;
 	private clientType: ClientType;
@@ -30,6 +31,7 @@ export class CoreClient {
 	private apiUrl: string;
 	private auth: string;
 	private primary: boolean;
+	logLevels: Record<LOG_LEVEL, boolean>;
 
 	constructor(data: {
 		botId: string;
@@ -47,6 +49,11 @@ export class CoreClient {
 		this.apiUrl = data.apiUrl ?? API_URL;
 		this.auth = data.auth;
 		this.primary = data.primary ?? true;
+		this.logLevels = {
+			debug: false,
+			error: true,
+			info: true,
+		};
 
 		if (this.primary) {
 			this.patchBot({}); // update client type
@@ -72,6 +79,24 @@ export class CoreClient {
 				1000 * 60 * 30
 			);
 		}
+
+		this.log('info', 'Client ready');
+	}
+
+	log(level: LOG_LEVEL, ...args: any[]) {
+		if (this.logLevels[level]) {
+			switch (level) {
+				case 'debug':
+					console.debug(new Date(), ' | Discolytics | ', ...args);
+					break;
+				case 'error':
+					console.error(new Date(), ' | Discolytics | ', ...args);
+					break;
+				case 'info':
+					console.log(new Date(), ' | Discolytics | ', ...args);
+					break;
+			}
+		}
 	}
 
 	async getBot(): Promise<
@@ -84,7 +109,10 @@ export class CoreClient {
 		}).catch(() => null);
 
 		// no response
-		if (!res) return { success: false, data: null };
+		if (!res) {
+			this.log('error', 'No response on get bot');
+			return { success: false, data: null };
+		}
 
 		const data = (await res.json()) as GetBotData;
 
@@ -100,7 +128,8 @@ export class CoreClient {
 					botUserName: user.username,
 					botUserAvatar: this.getAvatarUrl(user),
 				});
-				if (success) console.log('Updated bot profile');
+				if (success) this.log('info', 'Updated bot profile');
+				else this.log('error', 'Failed to update bot profile');
 			}
 		}
 
@@ -118,7 +147,10 @@ export class CoreClient {
 		}).catch(() => null);
 
 		// no response
-		if (!res) return { success: false };
+		if (!res) {
+			this.log('error', 'Failed to patch bot');
+			return { success: false };
+		}
 
 		return { success: res.status >= 200 && res.status < 300 };
 	}
@@ -141,6 +173,7 @@ export class CoreClient {
 
 		if (!res) {
 			// no response
+			this.log('error', 'Failed to send event : ' + name);
 			return { success: false };
 		}
 
@@ -166,6 +199,7 @@ export class CoreClient {
 
 		if (!res) {
 			// no response
+			this.log('error', 'Failed to post interaction type : ' + type);
 			return { success: false };
 		}
 
@@ -188,6 +222,7 @@ export class CoreClient {
 
 		if (!res) {
 			// no response
+			this.log('error', 'Failed to post CPU usage : ' + value);
 			return { success: false };
 		}
 
@@ -210,6 +245,7 @@ export class CoreClient {
 
 		if (!res) {
 			// no response
+			this.log('error', 'Failed to post memory usage : ' + value);
 			return { success: false };
 		}
 
@@ -250,6 +286,7 @@ export class CoreClient {
 
 		if (!res) {
 			// no response
+			this.log('error', 'Failed to post command : ' + name);
 			return { success: false };
 		}
 
@@ -264,7 +301,10 @@ export class CoreClient {
 			},
 		}).catch(() => null);
 
-		if (!res) return;
+		if (!res) {
+			this.log('error', 'Failed to get bot user');
+			return;
+		}
 
 		const data = (await res.json()) as User;
 
@@ -291,7 +331,10 @@ export class CoreClient {
 			method: 'POST',
 		}).catch(() => null);
 
-		if (!res) return { success: false };
+		if (!res) {
+			this.log('error', 'Failed to send heartbeat');
+			return { success: false };
+		}
 
 		const success = res.status >= 200 && res.status < 300;
 		return { success };
@@ -304,7 +347,10 @@ export class CoreClient {
 			},
 		}).catch(() => null);
 
-		if (!res) return;
+		if (!res) {
+			this.log('error', 'Failed to get Discord application');
+			return;
+		}
 
 		const data = (await res.json()) as Application;
 
@@ -334,7 +380,10 @@ export class CoreClient {
 			}
 		).catch(() => null);
 
-		if (!res) return { success: false };
+		if (!res) {
+			this.log('error', 'Failed to post guild count : ' + count);
+			return { success: false };
+		}
 
 		const success = res.status >= 200 && res.status < 300;
 		return { success };
