@@ -6,7 +6,7 @@ import {
 	DISCORD_API_URL,
 	type LOG_LEVEL,
 } from './constants';
-import type { Application, InteractionTypes, User } from './types/discord';
+import type { Application, User } from './types/discord';
 import pidusage from 'pidusage';
 
 interface GetBotData {
@@ -181,7 +181,7 @@ export class Discolytics {
 		return { success };
 	}
 
-	async postInteraction(type: InteractionTypes, guildId?: string) {
+	async postInteraction(type: number, guildId?: string) {
 		const res = await fetch(
 			`${this.dataApiUrl}/bots/${this.botId}/interactions`,
 			{
