@@ -1,5 +1,7 @@
 import { Discolytics as CoreClient, ClientType } from '@discolytics/core';
 import type { Client as Bot } from 'oceanic.js';
+import fs from 'fs';
+import path from 'path';
 
 export class Discolytics {
 	private core: CoreClient;
@@ -18,6 +20,7 @@ export class Discolytics {
 			...data,
 			clientType: ClientType.OCEANIC_JS,
 			auth: data.bot.options.auth,
+			clientVersion: this.getClientVersion(),
 		});
 		this.bot = data.bot;
 
@@ -32,5 +35,16 @@ export class Discolytics {
 
 	startCommand(name: string, userId: string) {
 		return this.core.startCommand(name, userId);
+	}
+
+	getClientVersion(): string | undefined {
+		try {
+			const json = JSON.parse(
+				fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')
+			);
+			return json?.version ?? undefined;
+		} catch {
+			return undefined;
+		}
 	}
 }

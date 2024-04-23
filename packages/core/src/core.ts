@@ -21,12 +21,15 @@ interface PatchBotData {
 	botUserId?: string;
 	botUserName?: string;
 	botUserAvatar?: string;
+	clientType?: ClientType;
+	clientVersion?: string;
 }
 
 export class Discolytics {
 	private botId: string;
 	private apiKey: string;
 	private clientType: ClientType;
+	private clientVersion?: string;
 	private dataApiUrl: string;
 	private apiUrl: string;
 	private auth: string;
@@ -37,6 +40,7 @@ export class Discolytics {
 		botId: string;
 		apiKey: string;
 		clientType?: ClientType;
+		clientVersion?: string;
 		dataApiUrl?: string;
 		apiUrl?: string;
 		auth: string;
@@ -45,6 +49,7 @@ export class Discolytics {
 		this.botId = data.botId;
 		this.apiKey = data.apiKey;
 		this.clientType = data.clientType ?? ClientType.UNKNOWN;
+		this.clientVersion = data.clientVersion;
 		this.dataApiUrl = data.dataApiUrl ?? DATA_API_URL;
 		this.apiUrl = data.apiUrl ?? API_URL;
 		this.auth = data.auth;
@@ -68,10 +73,12 @@ export class Discolytics {
 				});
 			}, 1000 * 10);
 
+			this.sendHeartbeat();
 			setInterval(() => {
 				this.sendHeartbeat();
 			}, 1000 * 30);
 
+			this.postGuildCount();
 			setInterval(
 				() => {
 					this.postGuildCount();
@@ -142,7 +149,11 @@ export class Discolytics {
 				Authorization: this.apiKey,
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ ...data, clientType: this.clientType }),
+			body: JSON.stringify({
+				...data,
+				clientType: this.clientType,
+				clientVersion: this.clientVersion,
+			}),
 			method: 'PATCH',
 		}).catch(() => null);
 
@@ -178,6 +189,8 @@ export class Discolytics {
 		}
 
 		const success = res.status >= 200 && res.status < 300;
+		if (!success)
+			this.log('error', 'Sent event returned status code : ' + res.status);
 		return { success };
 	}
 
@@ -204,6 +217,11 @@ export class Discolytics {
 		}
 
 		const success = res.status >= 200 && res.status < 300;
+		if (!success)
+			this.log(
+				'error',
+				'Post interaction returned status code : ' + res.status
+			);
 		return { success };
 	}
 
@@ -227,6 +245,8 @@ export class Discolytics {
 		}
 
 		const success = res.status >= 200 && res.status < 300;
+		if (!success)
+			this.log('error', 'Post CPU usage returned status : ' + res.status);
 		return { success };
 	}
 
@@ -250,6 +270,8 @@ export class Discolytics {
 		}
 
 		const success = res.status >= 200 && res.status < 300;
+		if (!success)
+			this.log('error', 'Post memory usage returned status : ' + res.status);
 		return { success };
 	}
 
@@ -291,6 +313,8 @@ export class Discolytics {
 		}
 
 		const success = res.status >= 200 && res.status < 300;
+		if (!success)
+			this.log('error', 'Post command returned status : ' + res.status);
 		return { success };
 	}
 
@@ -337,6 +361,8 @@ export class Discolytics {
 		}
 
 		const success = res.status >= 200 && res.status < 300;
+		if (!success)
+			this.log('error', 'Sent heartbeat returned status : ' + res.status);
 		return { success };
 	}
 
@@ -386,6 +412,8 @@ export class Discolytics {
 		}
 
 		const success = res.status >= 200 && res.status < 300;
+		if (!success)
+			this.log('error', 'Post guild count returned status : ' + res.status);
 		return { success };
 	}
 }
