@@ -25,6 +25,23 @@ interface PatchBotData {
 	clientVersion?: string;
 }
 
+interface Event {
+	name: string;
+	guildId?: string;
+}
+
+interface Interaction {
+	type: number;
+	guildId?: string;
+}
+
+interface Command {
+	name: string;
+	userId: string;
+	duration: number;
+	metadata?: unknown;
+}
+
 export class Discolytics {
 	private botId: string;
 	private apiKey: string;
@@ -35,6 +52,9 @@ export class Discolytics {
 	private auth: string;
 	private primary: boolean;
 	logLevels: Record<LOG_LEVEL, boolean>;
+	private pendingEvents: Event[];
+	private pendingInteractions: Interaction[];
+	private pendingCommands: Command[];
 
 	constructor(data: {
 		botId: string;
@@ -59,6 +79,15 @@ export class Discolytics {
 			error: true,
 			info: true,
 		};
+		this.pendingEvents = [];
+		this.pendingInteractions = [];
+		this.pendingCommands = [];
+
+		setInterval(() => {
+			this.postEvents();
+			this.postInteractions();
+			this.postCommands();
+		}, 1000 * 15);
 
 		if (this.primary) {
 			this.patchBot({}); // update client type
@@ -166,10 +195,7 @@ export class Discolytics {
 		return { success: res.status >= 200 && res.status < 300 };
 	}
 
-	async sendEvent(
-		name: string,
-		guildId?: string
-	): Promise<{ success: boolean }> {
+	private async postEvents(): Promise<{ success: boolean }> {
 		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/events`, {
 			headers: {
 				'Content-Type': 'application/json',
@@ -177,24 +203,38 @@ export class Discolytics {
 			},
 			method: 'POST',
 			body: JSON.stringify({
-				name,
-				guildId,
+				events: this.pendingEvents,
 			}),
 		}).catch(() => null);
 
+		const len = this.pendingEvents.length;
+		this.pendingEvents = [];
+
 		if (!res) {
 			// no response
-			this.log('error', 'Failed to send event : ' + name);
+			this.log('error', `Failed to post ${len} events`);
 			return { success: false };
 		}
 
 		const success = res.status >= 200 && res.status < 300;
 		if (!success)
-			this.log('error', 'Sent event returned status code : ' + res.status);
+			this.log(
+				'error',
+				`Post events (${len}) returned status code : ` + res.status
+			);
+		else this.log('debug', `Posted ${len} events`);
 		return { success };
 	}
 
-	async postInteraction(type: number, guildId?: string) {
+	/**
+	 * Adds an event to the queue. The queue is posted to Discolytics every 15 seconds.
+	 */
+	sendEvent(name: string, guildId?: string) {
+		this.pendingEvents.push({ name, guildId });
+		this.log('debug', `Added event to queue : ${name} (Guild ID: ${guildId})`);
+	}
+
+	private async postInteractions(): Promise<{ success: boolean }> {
 		const res = await fetch(
 			`${this.dataApiUrl}/bots/${this.botId}/interactions`,
 			{
@@ -204,25 +244,38 @@ export class Discolytics {
 				},
 				method: 'POST',
 				body: JSON.stringify({
-					type,
-					guildId,
+					interactions: this.pendingInteractions,
 				}),
 			}
 		).catch(() => null);
 
+		const len = this.pendingInteractions.length;
+		this.pendingInteractions = [];
+
 		if (!res) {
 			// no response
-			this.log('error', 'Failed to post interaction type : ' + type);
+			this.log('error', `Failed to post ${len} interactions`);
 			return { success: false };
 		}
-
 		const success = res.status >= 200 && res.status < 300;
 		if (!success)
 			this.log(
 				'error',
-				'Post interaction returned status code : ' + res.status
+				`Post interactions (${len}) returned status code : ${res.status}`
 			);
+		else this.log('debug', `Posted ${len} interactions`);
 		return { success };
+	}
+
+	/**
+	 * Adds an interaction to the queue. The queue is posted to Discolytics every 15 seconds.
+	 */
+	postInteraction(type: number, guildId?: string) {
+		this.pendingInteractions.push({ type, guildId });
+		this.log(
+			'debug',
+			`Added interaction to queue : ${type} (Guild ID: ${guildId})`
+		);
 	}
 
 	async postCpuUsage(value: number) {
@@ -278,44 +331,53 @@ export class Discolytics {
 	startCommand(name: string, userId: string) {
 		const start = Date.now();
 		return {
-			end: async (metadata?: unknown) => {
+			end: (metadata?: unknown) => {
 				const end = Date.now();
 				const duration = end - start;
-				return await this.postCommand(name, userId, duration, metadata);
+				return this.postCommand(name, userId, duration, metadata);
 			},
 		};
 	}
 
-	async postCommand(
-		name: string,
-		userId: string,
-		duration: number,
-		metadata?: unknown
-	) {
-		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/command`, {
+	async postCommands(): Promise<{ success: boolean }> {
+		const res = await fetch(`${this.dataApiUrl}/bots/${this.botId}/commands`, {
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: this.apiKey,
 			},
 			method: 'POST',
 			body: JSON.stringify({
-				name,
-				userId,
-				metadata,
-				duration,
+				commands: this.pendingCommands,
 			}),
 		}).catch(() => null);
 
+		const len = this.pendingCommands.length;
+		this.pendingCommands = [];
+
 		if (!res) {
 			// no response
-			this.log('error', 'Failed to post command : ' + name);
+			this.log('error', `Failed to post ${len} commands`);
 			return { success: false };
 		}
 
 		const success = res.status >= 200 && res.status < 300;
 		if (!success)
-			this.log('error', 'Post command returned status : ' + res.status);
+			this.log(
+				'error',
+				`Post commands (${len}) returned status code : ${res.status}`
+			);
+		else this.log('debug', `Posted ${len} commands`);
 		return { success };
+	}
+
+	postCommand(
+		name: string,
+		userId: string,
+		duration: number,
+		metadata?: unknown
+	) {
+		this.pendingCommands.push({ name, userId, duration, metadata });
+		this.log('debug', `Added command to queue : ${name} (User ID: ${userId})`);
 	}
 
 	private async getBotUser() {

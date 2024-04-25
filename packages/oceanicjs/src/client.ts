@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 export class Discolytics {
-	private core: CoreClient;
+	core: CoreClient;
 	private bot: Bot;
 
 	constructor(data: {
@@ -26,9 +26,9 @@ export class Discolytics {
 
 		this.bot.on('packet', async (data) => {
 			const d = data.d as any;
-			await this.core.sendEvent(data.t, d?.guild_id);
+			this.core.sendEvent(data.t, d?.guild_id);
 			if (data.t === 'INTERACTION_CREATE' && d?.type) {
-				await this.core.postInteraction(d.type, d.guild_id);
+				this.core.postInteraction(d.type, d.guild_id);
 			}
 		});
 	}
