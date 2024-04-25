@@ -1,5 +1,11 @@
 # @discolytics/core
 
+## 0.4.0
+
+### Minor Changes
+
+- send data in bulk
+
 ## 0.3.6
 
 ### Patch Changes
