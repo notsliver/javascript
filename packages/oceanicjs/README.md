@@ -1,6 +1,6 @@
 # 1. Installation
 
-npm install @discolytics/oceanicjs
+> npm install @discolytics/oceanicjs
 
 # 2. Get API Key
 

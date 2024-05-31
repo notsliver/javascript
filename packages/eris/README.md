@@ -1,6 +1,6 @@
 # 1. Installation
 
-npm install @discolytics/eris
+> npm install @discolytics/eris
 
 # 2. Get API Key
 

@@ -1,6 +1,6 @@
 # 1. Installation
 
-npm install @discolytics/discordjs
+> npm install @discolytics/discordjs
 
 # 2. Get API Key
 
