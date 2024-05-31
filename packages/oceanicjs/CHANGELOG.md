@@ -1,5 +1,11 @@
 # @discolytics/oceanicjs
 
+## 0.4.1
+
+### Patch Changes
+
+- add readme
+
 ## 0.4.0
 
 ### Minor Changes
