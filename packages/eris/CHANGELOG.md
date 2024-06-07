@@ -1,5 +1,16 @@
 # @discolytics/eris
 
+## 1.0.0
+
+### Major Changes
+
+- v1.0.0 release
+
+### Patch Changes
+
+- Updated dependencies
+  - @discolytics/core@1.0.0
+
 ## 0.4.2
 
 ### Patch Changes
