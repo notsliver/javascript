@@ -19,7 +19,7 @@ const { Discolytics } = require('@discolytics/discordjs');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-new Discolytics({
+const discolytics = new Discolytics({
 	botId: 'YOUR_BOT_ID',
 	apiKey: process.env.DISCOLYTICS_KEY,
 	bot: client,
@@ -28,6 +28,14 @@ new Discolytics({
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
+
+	// start a new command with discolytics.startCommand(). Provide the command name and user ID.
+	const command = discolytics.startCommand('help', '123');
+
+	setTimeout(() => {
+		// run the .end() method on the command to end it, posts the command with the calculated duration
+		command.end();
+	}, 5000);
 });
 
 client.login(process.env.TOKEN);
