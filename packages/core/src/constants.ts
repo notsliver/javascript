@@ -7,6 +7,8 @@ export enum ClientType {
 	DISCORD_JS,
 	ERIS,
 	OCEANIC_JS,
+	PYCORE,
+	DISCORDJS_WS,
 }
 
 export type LOG_LEVEL = 'info' | 'error' | 'debug'

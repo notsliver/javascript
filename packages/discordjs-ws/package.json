@@ -1,5 +1,5 @@
 {
-	"name": "@discolytics/discordjs",
+	"name": "@discolytics/discordjs-ws",
 	"version": "1.0.1",
 	"description": "",
 	"main": "./dist/index.js",
@@ -18,9 +18,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@discolytics/core": "^1.0.1"
-	},
-	"devDependencies": {
-		"discord.js": "^14.14.0"
+		"@discolytics/core": "^1.0.1",
+		"@discordjs/ws": "^1.1.1"
 	}
 }

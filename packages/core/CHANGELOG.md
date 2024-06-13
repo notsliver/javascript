@@ -1,5 +1,11 @@
 # @discolytics/core
 
+## 1.0.1
+
+### Patch Changes
+
+- update core, discordjs-ws package
+
 ## 1.0.0
 
 ### Major Changes

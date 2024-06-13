@@ -42,6 +42,11 @@ interface Command {
 	metadata?: unknown;
 }
 
+const parseAuth = (s: string) => {
+	if (s.startsWith('Bot')) return s;
+	return `Bot ${s}`;
+};
+
 export class Discolytics {
 	private botId: string;
 	private apiKey: string;
@@ -72,7 +77,7 @@ export class Discolytics {
 		this.clientVersion = data.clientVersion;
 		this.dataApiUrl = data.dataApiUrl ?? DATA_API_URL;
 		this.apiUrl = data.apiUrl ?? API_URL;
-		this.auth = data.auth;
+		this.auth = parseAuth(data.auth);
 		this.primary = data.primary ?? true;
 		this.logLevels = {
 			debug: false,
