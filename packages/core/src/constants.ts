@@ -11,4 +11,13 @@ export enum ClientType {
 	DISCORDJS_WS,
 }
 
+export enum InteractionTypes {
+    PING = 1,
+    APPLICATION_COMMAND = 2,
+    MESSAGE_COMPONENT = 3,
+    APPLICATION_COMMAND_AUTOCOMPLETE = 4,
+    MODAL_SUBMIT = 5,
+}
+
 export type LOG_LEVEL = 'info' | 'error' | 'debug'
+
