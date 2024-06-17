@@ -4,6 +4,7 @@ import {
 	ClientType,
 	DATA_API_URL,
 	DISCORD_API_URL,
+	InteractionTypes,
 	type LOG_LEVEL,
 } from './constants';
 import type { Application, User } from './types/discord';
@@ -12,8 +13,7 @@ import pidusage from 'pidusage';
 interface GetBotData {
 	captureEvents: string[];
 	botUserId: string | null;
-	botUserName: string | null;
-	botUserAvatar: string | null;
+	botUserName: string | null;	botUserAvatar: string | null;
 	profileLastUpdated: number | null;
 }
 
@@ -43,8 +43,23 @@ interface Command {
 }
 
 const parseAuth = (s: string) => {
-	if (s.startsWith('Bot')) return s;
-	return `Bot ${s}`;
+	if (!s) {
+	  console.error(new Date(), ' | Discolytics | ', 'Auth string is empty or undefined || If you are using "authToken" please change it into "auth"');
+	  return '';
+	}
+  
+	if (typeof s !== 'string') {
+	  console.error(new Date(), ' | Discolytics | ', "Auth string is not a valid string");
+	  return '';
+	}
+  
+	if (!s.startsWith('Bot')) {
+	  console.error(new Date(), ' | Discolytics | ', 'Auth string does not start with "Bot"');
+
+	  return `Bot ${s}`;
+	}
+  
+	return s;
 };
 
 export class Discolytics {
@@ -235,6 +250,16 @@ export class Discolytics {
 	 * Adds an event to the queue. The queue is posted to Discolytics every 15 seconds.
 	 */
 	sendEvent(name: string, guildId?: string) {
+		if (!name || typeof name !== 'string') {
+			this.log('error', 'Event name is required and must be a string');
+			return;
+		}
+	
+		if (guildId && typeof guildId !== 'string') {
+			this.log('error', 'Guild ID must be a string');
+			return;
+		}
+	
 		this.pendingEvents.push({ name, guildId });
 		this.log('debug', `Added event to queue : ${name} (Guild ID: ${guildId})`);
 	}
@@ -276,11 +301,23 @@ export class Discolytics {
 	 * Adds an interaction to the queue. The queue is posted to Discolytics every 15 seconds.
 	 */
 	postInteraction(type: number, guildId?: string) {
-		this.pendingInteractions.push({ type, guildId });
-		this.log(
-			'debug',
-			`Added interaction to queue : ${type} (Guild ID: ${guildId})`
-		);
+		if (type == null || typeof type !== 'number') {
+			this.log('error', 'The type parameter is required and must be a number');
+			return;
+		}
+	
+		if (!Object.values(InteractionTypes).includes(type)) {
+			this.log('error', 'Invalid interaction type');
+			return;
+		}
+	
+		if (guildId && typeof guildId !== 'string') {
+			this.log('error', 'Guild ID must be a string if provided');
+			return;
+		}
+	
+		this.pendingInteractions.push({ type: type as InteractionTypes, guildId });
+		this.log('debug', `Added interaction to queue: ${type} (Guild ID: ${guildId})`);
 	}
 
 	async postCpuUsage(value: number) {
@@ -334,6 +371,16 @@ export class Discolytics {
 	}
 
 	startCommand(name: string, userId: string) {
+		if (!name || typeof name !== 'string') {
+			this.log('error', 'The name parameter is required and must be a non-empty string');
+			return;
+		}
+	
+		if (!userId || typeof userId !== 'string') {
+			this.log('error', 'The userId parameter is required and must be a non-empty string');
+			return;
+		}
+	
 		const start = Date.now();
 		return {
 			end: (metadata?: unknown) => {
@@ -381,6 +428,21 @@ export class Discolytics {
 		duration: number,
 		metadata?: unknown
 	) {
+		if (!name || typeof name !== 'string') {
+			this.log('error', 'Command name is required and must be a string');
+			return;
+		}
+	
+		if (!userId || typeof userId !== 'string') {
+			this.log('error', 'User ID is required and must be a string');
+			return;
+		}
+	
+		if (typeof duration !== 'number' || duration < 0) {
+			this.log('error', 'Duration must be a non-negative number');
+			return;
+		}
+	
 		this.pendingCommands.push({ name, userId, duration, metadata });
 		this.log('debug', `Added command to queue : ${name} (User ID: ${userId})`);
 	}
@@ -484,3 +546,4 @@ export class Discolytics {
 		return { success };
 	}
 }
+
